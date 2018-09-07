@@ -38,7 +38,7 @@
             <EditText
                 android:id="@+id/edit_book_author"
                 style="@style/EditorFieldStyle"
-                android:hint="@string/hint_book_author"
+                android:hint="@string/hint_author"
                 android:inputType="textCapWords" />
 
 

@@ -144,10 +144,10 @@ public class EditorActivity extends AppCompatActivity implements
         if (mCurrentBookUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(authorString) && TextUtils.isEmpty(priceString) &&
                 TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(supplierName) && TextUtils.isEmpty(supplierPhone)) {
+            Toast.makeText(this, R.string.check_fields, Toast.LENGTH_SHORT).show();
             // Since no fields were modified, we can return early without creating a new schoolbook.
             // No need to create ContentValues and no need to do any ContentProvider operations.
-            return false;
-
+            return true;
         } else if (TextUtils.isEmpty(titleString)) {
             Toast.makeText(this, R.string.check_name, Toast.LENGTH_SHORT).show();
             return false;
@@ -166,15 +166,18 @@ public class EditorActivity extends AppCompatActivity implements
         } else if (TextUtils.isEmpty(supplierPhone)) {
             Toast.makeText(this, R.string.check_phone, Toast.LENGTH_SHORT).show();
             return false;
-        }
+        } else if (TextUtils.isEmpty(titleString) && TextUtils.isEmpty(authorString) && TextUtils.isEmpty(priceString) &&
+                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(supplierName) && TextUtils.isEmpty(supplierPhone)) {
+            Toast.makeText(this, R.string.check_fields, Toast.LENGTH_SHORT).show();
 
+            return false;
+        }
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(BookEntry.COLUMN_BOOK_NAME, titleString);
         values.put(BookEntry.COLUMN_BOOK_AUTHOR, authorString);
         values.put(BookEntry.COLUMN_BOOK_PRICE, priceString);
-        ;
         values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantityString);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplierName);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE, supplierPhone);
@@ -247,10 +250,12 @@ public class EditorActivity extends AppCompatActivity implements
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save book to database
-                if (validToSave == saveProduct())
+                if (saveProduct()) {
                     saveProduct();
-                // Exit activity
+                }
                 finish();
+                // Exit activity
+
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
