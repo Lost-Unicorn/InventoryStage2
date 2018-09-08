@@ -31,7 +31,6 @@ public class EditorActivity extends AppCompatActivity implements
      * Identifier for the book data loader
      */
     private static final int EXISTING_BOOK_LOADER = 0;
-    public boolean validToSave;
     String sNum;
     EditText numText;
     /**
@@ -63,6 +62,8 @@ public class EditorActivity extends AppCompatActivity implements
      * Boolean flag that keeps track of whether the book has been edited (true) or not (false)
      */
     private boolean mBookHasChanged = false;
+    public boolean validToSave = false;
+
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -105,12 +106,12 @@ public class EditorActivity extends AppCompatActivity implements
         }
 
         // Find all relevant views that we will need to read user input from
-        mNameEditText = (EditText) findViewById(R.id.edit_book_name);
-        mAuthorEditText = (EditText) findViewById(R.id.edit_book_author);
-        mPriceEditText = (EditText) findViewById(R.id.edit_book_price);
-        mQuantityEditText = (EditText) findViewById(R.id.edit_quantity);
-        mSupplierEditText = (EditText) findViewById(R.id.edit_supplier_name);
-        mPhoneEditText = (EditText) findViewById(R.id.edit_phone);
+        mNameEditText = findViewById(R.id.edit_book_name);
+        mAuthorEditText = findViewById(R.id.edit_book_author);
+        mPriceEditText = findViewById(R.id.edit_book_price);
+        mQuantityEditText = findViewById(R.id.edit_quantity);
+        mSupplierEditText = findViewById(R.id.edit_supplier_name);
+        mPhoneEditText = findViewById(R.id.edit_phone);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -121,7 +122,7 @@ public class EditorActivity extends AppCompatActivity implements
         mQuantityEditText.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
         mPhoneEditText.setOnTouchListener(mTouchListener);
-        ;
+
 
 
     }
@@ -129,7 +130,7 @@ public class EditorActivity extends AppCompatActivity implements
     /**
      * Get user input from editor and save pet into database.
      */
-    private boolean saveProduct() {
+    private void saveProduct() {
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
         String titleString = mNameEditText.getText().toString().trim();
@@ -147,33 +148,32 @@ public class EditorActivity extends AppCompatActivity implements
             Toast.makeText(this, R.string.check_fields, Toast.LENGTH_SHORT).show();
             // Since no fields were modified, we can return early without creating a new schoolbook.
             // No need to create ContentValues and no need to do any ContentProvider operations.
-            return true;
+            return;
+
         } else if (TextUtils.isEmpty(titleString)) {
             Toast.makeText(this, R.string.check_name, Toast.LENGTH_SHORT).show();
-            return false;
+            return;
         } else if (TextUtils.isEmpty(authorString)) {
             Toast.makeText(this, R.string.check_author, Toast.LENGTH_SHORT).show();
-            return false;
+            return;
         } else if (TextUtils.isEmpty(priceString)) {
             Toast.makeText(this, R.string.check_price, Toast.LENGTH_SHORT).show();
-            return false;
+            return;
         } else if (TextUtils.isEmpty(quantityString)) {
             Toast.makeText(this, R.string.check_qty, Toast.LENGTH_SHORT).show();
-            return false;
+            return;
         } else if (TextUtils.isEmpty(supplierName)) {
             Toast.makeText(this, R.string.check_supplier, Toast.LENGTH_SHORT).show();
-            return false;
+            return;
         } else if (TextUtils.isEmpty(supplierPhone)) {
             Toast.makeText(this, R.string.check_phone, Toast.LENGTH_SHORT).show();
-            return false;
-        } else if (TextUtils.isEmpty(titleString) && TextUtils.isEmpty(authorString) && TextUtils.isEmpty(priceString) &&
-                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(supplierName) && TextUtils.isEmpty(supplierPhone)) {
-            Toast.makeText(this, R.string.check_fields, Toast.LENGTH_SHORT).show();
+            return;
 
-            return false;
         }
+
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
+
         ContentValues values = new ContentValues();
         values.put(BookEntry.COLUMN_BOOK_NAME, titleString);
         values.put(BookEntry.COLUMN_BOOK_AUTHOR, authorString);
@@ -217,7 +217,7 @@ public class EditorActivity extends AppCompatActivity implements
                         Toast.LENGTH_SHORT).show();
             }
         }
-        return false;
+        return;
     }
 
     @Override
@@ -250,12 +250,11 @@ public class EditorActivity extends AppCompatActivity implements
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save book to database
-                if (saveProduct()) {
                     saveProduct();
+                if (validToSave) {
+                    finish();
                 }
-                finish();
                 // Exit activity
-
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
